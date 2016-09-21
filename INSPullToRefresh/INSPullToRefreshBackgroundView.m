@@ -56,7 +56,7 @@
 #import "UIScrollView+INSPullToRefresh.h"
 #import "UIView+INSFirstReponder.h"
 
-CGFloat const INSPullToRefreshDefaultResetContentInsetAnimationTime = 0.3;
+CGFloat const INSPullToRefreshDefaultResetContentInsetAnimationTime = 0.1;
 CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
 
 #define fequal(a,b) (fabs((a) - (b)) < FLT_EPSILON)
@@ -163,7 +163,14 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
         
         dispatch_async(dispatch_get_main_queue(), ^{
 			if (self.state != INSPullToRefreshBackgroundViewStateNone) {
-				[self.scrollView setContentOffset:CGPointMake(_scrollView.contentOffset.x, -CGRectGetHeight(self.frame) -_externalContentInset.top ) animated:YES];
+				[UIView animateWithDuration:0.2f
+									  delay:0.1f
+									options:UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction
+								 animations:^{
+									 self.scrollView.contentOffset = CGPointMake(_scrollView.contentOffset.x, -CGRectGetHeight(self.frame) -_externalContentInset.top);
+								 }
+								 completion:NULL];
+
 			}
         });
         
@@ -173,12 +180,14 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
 - (void)endRefreshing {
     if (self.state != INSPullToRefreshBackgroundViewStateNone) {
         [self changeState:INSPullToRefreshBackgroundViewStateNone];
-        if (self.scrollToTopAfterEndRefreshing) {
-            CGPoint originalContentOffset = CGPointMake(-_externalContentInset.left, -_externalContentInset.top);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.scrollView setContentOffset:originalContentOffset animated:NO];
-            });
-        }
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+			if (self.scrollToTopAfterEndRefreshing) {
+				CGPoint originalContentOffset = CGPointMake(-_externalContentInset.left, -_externalContentInset.top);
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[self.scrollView setContentOffset:originalContentOffset animated:NO];
+				});
+			}
+		});
     }
 }
 
@@ -346,7 +355,7 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
 - (void)resetScrollViewContentInsetWithCompletion:(void(^)(BOOL finished))completion {
     [UIView animateWithDuration:INSPullToRefreshDefaultResetContentInsetAnimationTime
                           delay:0
-                        options:(UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState)
+                        options:(UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionBeginFromCurrentState)
                      animations:^{
                          [self setScrollViewContentInset:self.externalContentInset];
                      }
@@ -361,7 +370,7 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
     if (animated) {
         [UIView animateWithDuration:INSPullToRefreshDefaultResetContentInsetAnimationTime
                               delay:0
-                            options:(UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState)
+                            options:(UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionBeginFromCurrentState)
                          animations:updateBlock
                          completion:nil];
     } else {
