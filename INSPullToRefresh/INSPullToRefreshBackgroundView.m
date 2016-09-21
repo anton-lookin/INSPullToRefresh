@@ -216,18 +216,23 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
 }
 
 - (void)didMoveToSuperview {
-    [super didMoveToSuperview];
-    
-    UIViewController *firstReponderViewController = [self ins_firstResponderViewController];
-    firstReponderViewController.automaticallyAdjustsScrollViewInsets = NO;
-    
-    if (firstReponderViewController.navigationController && firstReponderViewController.navigationController.navigationBar.translucent && (firstReponderViewController.edgesForExtendedLayout & UIRectEdgeTop)) {
-        
-        self.scrollView.contentInset = UIEdgeInsetsMake(firstReponderViewController.navigationController.navigationBar.frame.origin.y + firstReponderViewController.navigationController.navigationBar.bounds.size.height, self.scrollView.contentInset.left, self.scrollView.contentInset.bottom, self.scrollView.contentInset.right);
-        self.scrollView.scrollIndicatorInsets = self.scrollView.contentInset;
-    } 
+	[super didMoveToSuperview];
+	
+	UIViewController *firstReponderViewController = [self ins_firstResponderViewController];
+	firstReponderViewController.automaticallyAdjustsScrollViewInsets = NO;
+	
+	UIEdgeInsets contentInset = self.scrollView.contentInset;
+	if (firstReponderViewController.navigationController && firstReponderViewController.navigationController.navigationBar.translucent && (firstReponderViewController.edgesForExtendedLayout & UIRectEdgeTop)) {
+		contentInset = UIEdgeInsetsMake(firstReponderViewController.navigationController.navigationBar.frame.origin.y + firstReponderViewController.navigationController.navigationBar.bounds.size.height, contentInset.left, contentInset.bottom, contentInset.right);
+	}
+ 
+	if (firstReponderViewController.tabBarController && firstReponderViewController.tabBarController.tabBar.translucent && (firstReponderViewController.edgesForExtendedLayout & UIRectEdgeBottom)) {
+		contentInset = UIEdgeInsetsMake(contentInset.top, contentInset.left, firstReponderViewController.tabBarController.tabBar.bounds.size.height, contentInset.right);
+	}
+	
+	self.scrollView.contentInset = contentInset;
+	self.scrollView.scrollIndicatorInsets = contentInset;
 }
-
 - (void)removeObserversFromView:(UIView *)view {
     NSParameterAssert([view isKindOfClass:[UIScrollView class]]);
 
@@ -262,7 +267,7 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
         if (viewController.navigationController.navigationBar.translucent && viewController.parentViewController == viewController.navigationController && self.scrollView.frame.origin.y <= navigationBarHeight) {
             self.externalContentInset = UIEdgeInsetsMake(navigationBarHeight - self.scrollView.frame.origin.y, self.externalContentInset.left, self.externalContentInset.bottom, self.externalContentInset.right);
         }
-        
+		
         [self resetFrame];
         self.scrollView.scrollIndicatorInsets = self.externalContentInset;
         [self setScrollViewContentInset:self.externalContentInset];
