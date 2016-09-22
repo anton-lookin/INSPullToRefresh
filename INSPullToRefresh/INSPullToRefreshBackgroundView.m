@@ -80,11 +80,12 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
 	INSPullToRefreshBackgroundViewState previousState = _state;
 	_state = newState;
 	
-//	[self setNeedsLayout];
-//	[self layoutIfNeeded];
+	[self setNeedsLayout];
+	[self layoutIfNeeded];
 	
 	switch (newState) {
 		case INSPullToRefreshBackgroundViewStateTriggered:
+			break;
 		case INSPullToRefreshBackgroundViewStateNone: {
 			[self resetScrollViewContentInsetWithCompletion:nil];
 			break;
@@ -159,37 +160,20 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
 	}
 	
 	if (self.state == INSPullToRefreshBackgroundViewStateNone) {
-		//		if (self.scrollView.contentOffset.y < 0.0f) {
-		//			UIEdgeInsets contentInset = self.scrollView.contentInset;
-		//			contentInset.top = self.scrollView.contentOffset.y;
-		//			self.scrollView.contentInset = contentInset;
-		//		}
-		
 		[self changeState:INSPullToRefreshBackgroundViewStateTriggered];
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			if (self.state != INSPullToRefreshBackgroundViewStateNone) {
-				//				[UIView animateWithDuration:0.2f
-				//									  delay:0.2f
-				//									options:UIViewAnimationOptionAllowAnimatedContent | UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction
-				//								 animations:^{
-				//									 self.scrollView.contentOffset = CGPointMake(_scrollView.contentOffset.x, -CGRectGetHeight(self.frame) -_externalContentInset.top);
-				//								 }
-				//								 completion:NULL];
-				
-			}
-		});
-		
-		[self changeState:INSPullToRefreshBackgroundViewStateLoading];
+		[UIView animateWithDuration:0.2f
+							  delay:0.0f
+							options:0ul
+						 animations:^{
+							[self setScrollViewContentInsetForLoadingAnimated:YES];
+						 } completion:^(BOOL finished) {
+							 [self changeState:INSPullToRefreshBackgroundViewStateLoading];
+						 }];
 	}
 }
 - (void)endRefreshing {
 	if (self.state != INSPullToRefreshBackgroundViewStateNone) {
 		[self changeState:INSPullToRefreshBackgroundViewStateNone];
-		//		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-		//			CGPoint originalContentOffset = CGPointMake(-_externalContentInset.left, -_externalContentInset.top);
-		//			self.scrollView.contentOffset = originalContentOffset;
-		//		});
 	}
 }
 
