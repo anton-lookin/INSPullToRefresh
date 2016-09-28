@@ -160,16 +160,18 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
 	}
 	
 	if (self.state == INSPullToRefreshBackgroundViewStateNone) {
-		[self changeState:INSPullToRefreshBackgroundViewStateTriggered];
-		[UIView animateWithDuration:0.2f
-							  delay:0.0f
-							options:0ul
-						 animations:^{
-							[self setScrollViewContentInsetForLoadingAnimated:YES];
-						 } completion:^(BOOL finished) {
-							 [self changeState:INSPullToRefreshBackgroundViewStateLoading];
-						 }];
+		[self endRefreshing];
 	}
+	
+	[self changeState:INSPullToRefreshBackgroundViewStateTriggered];
+	[UIView animateWithDuration:0.2f
+						  delay:0.0f
+						options:0ul
+					 animations:^{
+							[self setScrollViewContentInsetForLoadingAnimated:YES];
+					 } completion:^(BOOL finished) {
+						 [self changeState:INSPullToRefreshBackgroundViewStateLoading];
+					 }];
 }
 - (void)endRefreshing {
 	if (self.state != INSPullToRefreshBackgroundViewStateNone) {
