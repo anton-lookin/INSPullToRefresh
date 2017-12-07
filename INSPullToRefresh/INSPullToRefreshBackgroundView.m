@@ -168,7 +168,7 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
 						  delay:0.0f
 						options:0ul
 					 animations:^{
-							[self setScrollViewContentInsetForLoadingAnimated:YES];
+						 [self setScrollViewContentInsetForLoadingAnimated:YES];
 					 } completion:^(BOOL finished) {
 						 [self changeState:INSPullToRefreshBackgroundViewStateLoading];
 					 }];
@@ -222,7 +222,7 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
 	if (firstReponderViewController.navigationController && firstReponderViewController.navigationController.navigationBar.translucent && (firstReponderViewController.edgesForExtendedLayout & UIRectEdgeTop)) {
 		contentInset = UIEdgeInsetsMake(firstReponderViewController.navigationController.navigationBar.frame.origin.y + firstReponderViewController.navigationController.navigationBar.bounds.size.height, contentInset.left, contentInset.bottom, contentInset.right);
 	}
- 
+	
 	if (firstReponderViewController.tabBarController && firstReponderViewController.tabBarController.tabBar.translucent && (firstReponderViewController.edgesForExtendedLayout & UIRectEdgeBottom)) {
 		contentInset = UIEdgeInsetsMake(contentInset.top, contentInset.left, firstReponderViewController.tabBarController.tabBar.bounds.size.height, contentInset.right);
 	}
@@ -332,6 +332,8 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
 			[self changeState:INSPullToRefreshBackgroundViewStateLoading];
 		}
 		else if (dragging >= self.dragToTriggerOffset && self.scrollView.isDragging && self.state == INSPullToRefreshBackgroundViewStateNone) {
+			UISelectionFeedbackGenerator *selectionFeedbackGenerator = [[UISelectionFeedbackGenerator alloc] init];
+			[selectionFeedbackGenerator selectionChanged];
 			[self changeState:INSPullToRefreshBackgroundViewStateTriggered];
 		}
 		else if (dragging < self.dragToTriggerOffset && self.state != INSPullToRefreshBackgroundViewStateNone) {
@@ -417,3 +419,4 @@ CGFloat const INSPullToRefreshDefaultDragToTriggerOffset = 80;
 }
 
 @end
+
